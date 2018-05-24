@@ -8,6 +8,20 @@ import model.SiteObstacle;
 import model.SiteSource;
 import model.SiteType;
 
+import java.util.concurrent.Semaphore;
+
+import ch.icosys.popjava.core.PopJava;
+import ch.icosys.popjava.core.annotation.POPAsyncConc;
+import ch.icosys.popjava.core.annotation.POPAsyncSeq;
+import ch.icosys.popjava.core.annotation.POPClass;
+import ch.icosys.popjava.core.annotation.POPConfig;
+import ch.icosys.popjava.core.annotation.POPConfig.Type;
+import ch.icosys.popjava.core.annotation.POPObjectDescription;
+import ch.icosys.popjava.core.annotation.POPParameter;
+import ch.icosys.popjava.core.annotation.POPParameter.Direction;
+import ch.icosys.popjava.core.annotation.POPSyncMutex;
+import ch.icosys.popjava.core.annotation.POPSyncSeq;
+
 /**
  * This class is responsible to simulate a particular region of the simulation grid.
  * @author beat
