@@ -53,7 +53,6 @@ import ch.icosys.popjava.core.annotation.POPClass;
     	this.rows = rows;
     	this.cols = cols;
 
-
     	regions = new PixelFlowRegion[DIV_COL][DIV_ROW];
         for(int x = 0; x < regions.length/2; x++) {
         	for(int y = 0; y < regions[x].length/2; y++) {

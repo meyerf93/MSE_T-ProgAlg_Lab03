@@ -179,7 +179,7 @@ public class PixelFlowRegion {
     }
 
 	@POPSyncSeq
-    public void sendFlowBuffers() {
+    private void sendFlowBuffers() {
     	for(Direction dir : Direction.values()) {
     		if(neighbours.containsKey(dir)) {
     			int xTarget = x;
@@ -291,7 +291,7 @@ public class PixelFlowRegion {
     private SiteType getSiteType(int row, int col) {
 		return siteTypes[sites[row][col].getTypeIndex()];
 	}
-	
+
 	@POPSyncConc
 	private static double[] multiply(double[][] matrix, double[] vector) {
 		double[] result = new double[matrix.length];
