@@ -17,7 +17,7 @@ import ch.icosys.popjava.core.annotation.POPClass;
  *
  */
  @POPClass(isDistributable = false)
-public class PixelFlowManager implements IPixelFlowManager{
+ public class PixelFlowManager implements IPixelFlowManager{
 
 	private static final int WAVE_SAMPLING = 8;
 
@@ -41,6 +41,9 @@ public class PixelFlowManager implements IPixelFlowManager{
             SiteType[] siteTypesArray,
             SiteType defaultSiteType,
             float initialTemperature){
+
+        String[] hosts = new String("grid61","grid62","grid63","grid64");
+        Int[] core = {16,16,16,16};
         this.siteTypes = Arrays.asList(siteTypesArray);
         this.defaultSiteTypeIndex = siteTypes.indexOf(defaultSiteType);
         this.initialTemperature = initialTemperature;
@@ -50,12 +53,29 @@ public class PixelFlowManager implements IPixelFlowManager{
     	this.rows = rows;
     	this.cols = cols;
 
+
     	regions = new PixelFlowRegion[DIV_COL][DIV_ROW];
-        for(int x = 0; x < regions.length; x++) {
-        	for(int y = 0; y < regions[x].length; y++) {
-        		regions[x][y] = new PixelFlowRegion(deltaTimePerIteration, siteTypes.toArray(new SiteType[0]), "localhost");
+        for(int x = 0; x < regions.length/2; x++) {
+        	for(int y = 0; y < regions[x].length/2; y++) {
+        		regions[x][y] = new PixelFlowRegion(deltaTimePerIteration, siteTypes.toArray(new SiteType[0]), hosts[0],core[0]);
         	}
         }
+        for(int x = 0; x < regions.length/2; x++) {
+          for(int y = regions[x].length/2; y < regions[x].length; y++) {
+            regions[x][y] = new PixelFlowRegion(deltaTimePerIteration, siteTypes.toArray(new SiteType[0]), hosts[1],core[1]);
+          }
+        }
+        for(int x = regions.length/2; x < regions.length; x++) {
+        	for(int y = 0; y < regions[x].length; y++) {
+        		regions[x][y] = new PixelFlowRegion(deltaTimePerIteration, siteTypes.toArray(new SiteType[0]), hosts[2],core[2]);
+        	}
+        }
+        for(int x = regions.length/2; x < regions.length; x++) {
+        	for(int y = regions[x].lenght/2; y < regions[x].length; y++) {
+        		regions[x][y] = new PixelFlowRegion(deltaTimePerIteration, siteTypes.toArray(new SiteType[0]), hosts[3],core[3]);
+        	}
+        }
+
 
         for(int x = 0; x < regions.length; x++) {
         	for(int y = 0; y < regions[x].length; y++) {
@@ -154,7 +174,6 @@ public class PixelFlowManager implements IPixelFlowManager{
         		regions[x][y].updateFlows(getElapsedTime());
         	}
 		}
-
 		for(int x = 0; x < regions.length; x++) {
         	for(int y = 0; y < regions[x].length; y++) {
         		regions[x][y].finishFlowUpdate();
