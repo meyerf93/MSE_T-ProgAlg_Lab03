@@ -9,7 +9,7 @@ import model.SiteSource;
 import model.SiteType;
 
 import ch.icosys.popjava.core.annotation.POPClass;
-
+import ch.icosys.popjava.core.util.Configuration;
 
 /**
  * This class contains the whole simulation
