@@ -12,6 +12,7 @@ import java.util.concurrent.Semaphore;
 
 import ch.icosys.popjava.core.PopJava;
 import ch.icosys.popjava.core.annotation.POPAsyncConc;
+import ch.icosys.popjava.core.annotation.POPSyncConc;
 import ch.icosys.popjava.core.annotation.POPAsyncSeq;
 import ch.icosys.popjava.core.annotation.POPClass;
 import ch.icosys.popjava.core.annotation.POPConfig;
