@@ -319,7 +319,7 @@ public class PixelFlowRegion {
 		}
 		return result;
 	}
-
+		@POPSyncSeq
     public double[][] getGlobalFlows(double elapsedTime) {
         double [][] flows = new double[sites.length][sites[0].length];
 
@@ -331,7 +331,7 @@ public class PixelFlowRegion {
 
         return flows;
     }
-
+		@POPSyncSeq
     public double getGlobalFlowAtPosition(int row, int col, double elapsedTime) {
         Site site = getSite(row, col);
 
@@ -357,6 +357,7 @@ public class PixelFlowRegion {
      * Get width of this region
      * @return
      */
+		@POPSyncSeq
     public int getWidth() {
     	return sites.length;
     }
@@ -365,6 +366,7 @@ public class PixelFlowRegion {
      * Get height of this region
      * @return
      */
+		@POPSyncSeq
     public int getHeight() {
     	return sites[0].length;
     }
@@ -373,6 +375,7 @@ public class PixelFlowRegion {
      * X position of this region on the global grid
      * @return
      */
+		@POPSyncSeq
     public int getX() {
     	return x;
     }
@@ -381,6 +384,7 @@ public class PixelFlowRegion {
      * Y position of this region on the global grid
      * @return
      */
+		@POPSyncSeq
     public int getY() {
     	return y;
     }
@@ -389,11 +393,12 @@ public class PixelFlowRegion {
      * Set the types of all region types
      * @param regionTypes
      */
-	public void setSiteTypes(int[][] regionTypes) {
+		@POPSyncSeq
+		public void setSiteTypes(int[][] regionTypes) {
     	for(int x = 0; x < regionTypes.length; x++) {
             for(int y = 0; y < regionTypes[0].length; y++) {
             	sites[x][y].setTypeIndex(regionTypes[x][y]);
             }
     	}
-	}
+		}
 }
