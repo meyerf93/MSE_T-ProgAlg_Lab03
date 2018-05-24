@@ -42,8 +42,8 @@ import ch.icosys.popjava.core.annotation.POPClass;
             SiteType defaultSiteType,
             float initialTemperature){
 
-        String[] hosts = new String("grid61","grid62","grid63","grid64");
-        Int[] core = {16,16,16,16};
+        String[] hosts = {"grid61","grid62","grid63","grid64"};
+        int[] core = {16,16,16,16};
         this.siteTypes = Arrays.asList(siteTypesArray);
         this.defaultSiteTypeIndex = siteTypes.indexOf(defaultSiteType);
         this.initialTemperature = initialTemperature;
@@ -70,7 +70,7 @@ import ch.icosys.popjava.core.annotation.POPClass;
         	}
         }
         for(int x = regions.length/2; x < regions.length; x++) {
-        	for(int y = regions[x].lenght/2; y < regions[x].length; y++) {
+        	for(int y = regions[x].length/2; y < regions[x].length; y++) {
         		regions[x][y] = new PixelFlowRegion(deltaTimePerIteration, siteTypes.toArray(new SiteType[0]), hosts[3],core[3]);
         	}
         }
