@@ -142,7 +142,6 @@ public class PixelFlowManager implements IPixelFlowManager{
 		iterations++;
 	}
 
-	@POPAsyncSeq
 	private void updateFlows() {
 		for(int x = 0; x < regions.length; x++) {
         	for(int y = 0; y < regions[x].length; y++) {
@@ -163,7 +162,6 @@ public class PixelFlowManager implements IPixelFlowManager{
 		}
 	}
 
-  @POPAsyncSeq
 	private void updateTemperatures() {
 		for(int x = 0; x < regions.length; x++) {
         	for(int y = 0; y < regions[x].length; y++) {

@@ -13,78 +13,85 @@ import model.SiteType;
  * @author beat
  *
  */
+@POPClass
 public class PixelFlowRegion {
-	
+
 	public static enum Direction{
 		UP(3),
 		DOWN(2),
 		LEFT(1),
 		RIGHT(0);
-		
+
 		private final int index;
-		
+
 		Direction(int index){
 			this.index = index;
-		}		
+		}
 	}
-	
+
 	private final SiteType [] siteTypes;
     private Site[][] sites;
     private Site[][] tempSites;
     private int x, y;
     private final double deltaTimePerIteration;
-    
+
     private int globalRows, globalCols;
-    
+	private int cores;
+
     private double [][] neighbourFlows = new double[Direction.values().length][];
-    
+
     private Map<Direction, PixelFlowRegion> neighbours = new HashMap<>();
-    
+
     public PixelFlowRegion(){
         sites = null;
         deltaTimePerIteration = 0;
         siteTypes = null;
     }
-    
-    public PixelFlowRegion(final double deltaTimePerIteration, SiteType [] siteTypes, String url){
+
+	@POPObjectDescription(jvmParameters = "-XX:+UseG1GC -Xmx5500m -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=12")
+    public PixelFlowRegion(final double deltaTimePerIteration, SiteType [] siteTypes, @POPConfig(Type.URL) String url, int cores) {
     	this.deltaTimePerIteration = deltaTimePerIteration;
     	this.siteTypes = siteTypes;
+		this.cores = cores;
     }
-    
+
+	@POPAsyncConc
     public void createSites(int x, int y, int width, int height, int globalCols, int globalRows, boolean copy) {
     	this.x = x;
     	this.y = y;
-    	
+
     	this.globalRows = globalRows;
     	this.globalCols = globalCols;
-    	
+
     	if(sites == null || !copy) {
     		this.sites = new Site[width][height];
     	}else if(sites.length != width || sites[0].length != height){
     		Site [][] newSites = new Site[width][height];
-    		
+
     		for(int xLoop = 0; xLoop < sites.length && xLoop < width; xLoop++) {
             	for(int yLoop = 0; yLoop < sites[x].length && yLoop < height; yLoop++) {
             		newSites[xLoop][yLoop] = sites[xLoop][yLoop];
             	}
     		}
-    		
+
     		this.sites = newSites;
     	}
-    	
+
     	neighbourFlows[Direction.UP.index] = new double[width];
     	neighbourFlows[Direction.DOWN.index] = new double[width];
     	neighbourFlows[Direction.LEFT.index] = new double[height];
     	neighbourFlows[Direction.RIGHT.index] = new double[height];
     }
-    
+
     private PixelFlowRegion fake;
-    
+
+	@POPAsyncConc
     public void setNeighbour(PixelFlowRegion neighbour, Direction dir) {
         fake = neighbour;//TODO: This is a POPJava workaround as otherwise the connection is closed to neighbour after function ends
     	neighbours.put(dir, neighbour);
     }
-    
+
+	@POPAsyncConc
     public void initSites(int defaultSiteTypeIndex, float initialTemperature, boolean copy) {
     	for(int x = 0; x < sites.length; x++) {
         	for(int y = 0; y < sites[x].length; y++) {
@@ -97,35 +104,41 @@ public class PixelFlowRegion {
         	}
     	}
     }
-    
+
+	@POPSyncSeq
     public Site getSite(int row, int col) {
     	return sites[col - x][row - y];
     }
-    
+
+	@POPAsyncConc
     public void setSiteType(int col, int row, int type) {
     	sites[col - x][row - y].setTypeIndex(type);
     }
-    
+
+	@POPSyncConc
     public void setFlow(int col, int row, int flowIndex, double value) {
     	tempSites[col - x][row - y].getFlows()[flowIndex] = value;
     }
-    
+
+	@POPSyncSeq
     public Site[][] getAllSites(){
         return sites;
     }
-    
+
+	@POPSyncSeq
     public int[][] getSiteTypes() {
         int [][] types = new int[sites.length][sites[0].length];
-        
+
         for(int x = 0; x < types.length; x++) {
             for(int y = 0; y < types[0].length; y++) {
                 types[x][y] = sites[x][y].getTypeIndex();
             }
         }
-        
+
         return types;
     }
-    
+
+	@POPAsyncConc
 	public void prepareFlowUpdate() {
     	//Create copy of current sites
     	tempSites = new Site[sites.length][sites[0].length];
@@ -135,24 +148,25 @@ public class PixelFlowRegion {
 			}
 		}
 	}
-	
-    public void updateFlows(double elapsedTime) {    	
+
+	@POPSyncConc
+    public void updateFlows(double elapsedTime) {
     	for (int x = 0; x < sites.length; x++) {
 			for (int y = 0; y < sites[0].length; y++) {
 				SiteType siteTypeXY = getSiteType(x, y);
 				if (siteTypeXY instanceof SiteSource) {
 					float sourceValue = ((SiteSource) siteTypeXY).getValue(elapsedTime);
-					
+
 					updateTempSite(x + 1, y, Direction.RIGHT, sourceValue);
 					updateTempSite(x - 1, y, Direction.LEFT, sourceValue);
 					updateTempSite(x, y + 1, Direction.DOWN, sourceValue);
 					updateTempSite(x, y - 1, Direction.UP, sourceValue);
-					
+
 				} else {
 					SiteObstacle so = (SiteObstacle) siteTypeXY;
 					double[] gammaFlowPartXY = multiply(so.getGammaMatrix(), sites[x][y].getFlows());
 					double[] betaFlowPartXY = multiply(so.getBetaMatrix(), sites[x][y].getFlows());
-					
+
 					updateTempSite(x + 1, y, Direction.RIGHT, gammaFlowPartXY[Direction.RIGHT.index] + betaFlowPartXY[Direction.RIGHT.index]);
 					updateTempSite(x - 1, y, Direction.LEFT, gammaFlowPartXY[Direction.LEFT.index] + betaFlowPartXY[Direction.LEFT.index]);
 					updateTempSite(x, y + 1, Direction.DOWN, gammaFlowPartXY[Direction.DOWN.index] + betaFlowPartXY[Direction.DOWN.index]);
@@ -160,16 +174,17 @@ public class PixelFlowRegion {
 				}
 			}
 		}
-    	
+
     	sendFlowBuffers();
     }
-    
-    private void sendFlowBuffers() {
+
+	@POPSyncSeq
+    public void sendFlowBuffers() {
     	for(Direction dir : Direction.values()) {
     		if(neighbours.containsKey(dir)) {
     			int xTarget = x;
     			int yTarget = y;
-    			
+
     			Direction flowDir = null;
     			if(dir == Direction.UP) {
     				yTarget--;
@@ -184,7 +199,7 @@ public class PixelFlowRegion {
     				xTarget += sites.length;
     				flowDir = Direction.LEFT;
     			}
-    			
+
     			try {
     			    neighbours.get(dir).setFlows(neighbourFlows[dir.index], xTarget, yTarget, dir);
     			}catch(Throwable e) {
@@ -194,12 +209,13 @@ public class PixelFlowRegion {
     		}
     	}
     }
-    
+
+	@POPSyncConc
     public void setFlows(double [] flows, int xTarget, int yTarget, Direction dir) {
     	for(int i = 0; i < flows.length; i++) {
     		int col;
     		int row;
-    		
+
         	if(dir == Direction.UP || dir == Direction.DOWN) {
         		col = xTarget + i;
         		row = yTarget ;
@@ -207,19 +223,20 @@ public class PixelFlowRegion {
         		col = xTarget ;
         		row = yTarget + i;
         	}
-        	
+
         	setFlow(col, row, dir.index, flows[i]);
     	}
     }
-    
-    private void updateTempSite(int x, int y, Direction flowDir, double value) {
+
+	@POPSyncConc
+    public void updateTempSite(int x, int y, Direction flowDir, double value) {
     	//We are in our own grid
     	if(x >= 0 && y >= 0 && x < sites.length && y < sites[0].length) {
     		tempSites[x][y].getFlows()[flowDir.index] = value;
-    	}else {    		
+    	}else {
     		int realX = x + this.x;
     		int realY = y + this.y;
-    		
+
     		if(realX >= 0 && realY >= 0 && realX < globalCols && realY < globalRows) {
     			if(x < 0) {
     				neighbourFlows[Direction.LEFT.index][y] = value;
@@ -229,15 +246,17 @@ public class PixelFlowRegion {
     				neighbourFlows[Direction.RIGHT.index][y] = value;
     			}else if(y >= sites[0].length) {
     				neighbourFlows[Direction.DOWN.index][x] = value;
-    			}    			
+    			}
     		}
     	}
     }
 
+	@POPAsyncConc
 	public void finishFlowUpdate() {
 		this.sites = tempSites;
 	}
-    
+
+	@POPAsyncConc
     public void updateTemperatures() {
         for (int x = 0; x < sites.length; x++) {
             for (int y = 0; y < sites[0].length; y++) {
@@ -266,15 +285,18 @@ public class PixelFlowRegion {
                 sites[x][y].addTemperature(deltaTemperature);
             }
         }
-    	
+
     }
-    
+	@POPAsyncConc
     private SiteType getSiteType(int row, int col) {
 		return siteTypes[sites[row][col].getTypeIndex()];
 	}
-    
+	
+	@POPSyncConc
 	private static double[] multiply(double[][] matrix, double[] vector) {
 		double[] result = new double[matrix.length];
+
+		// Potential omp
 		for (int i = 0; i < result.length; i++) {
 			for (int j = 0; j < vector.length; j++) {
 				result[i] += matrix[i][j] * vector[j];
@@ -285,37 +307,37 @@ public class PixelFlowRegion {
 
     public double[][] getGlobalFlows(double elapsedTime) {
         double [][] flows = new double[sites.length][sites[0].length];
-        
+
         for(int x = 0; x < flows.length; x++) {
             for(int y = 0; y < flows[0].length; y++) {
                 flows[x][y] = getGlobalFlow(sites[x][y], elapsedTime);
             }
         }
-        
-        return flows;   
+
+        return flows;
     }
-    
+
     public double getGlobalFlowAtPosition(int row, int col, double elapsedTime) {
         Site site = getSite(row, col);
-        
+
         return getGlobalFlow(site, elapsedTime);
     }
-    
+
     private double getGlobalFlow(Site site, double elapsedTime) {
         SiteType s = siteTypes[site.getTypeIndex()];
-        
+
         if (s instanceof SiteSource) {
             return ((SiteSource) s).getValue(elapsedTime);
         }
-        
+
         float globalFlowValue = 0.0f;
         for (int i = 0; i < 4; i++) {
             globalFlowValue += site.getFlows()[i];
         }
-        
+
         return globalFlowValue;
     }
-    
+
     /**
      * Get width of this region
      * @return
@@ -331,7 +353,7 @@ public class PixelFlowRegion {
     public int getHeight() {
     	return sites[0].length;
     }
-    
+
     /**
      * X position of this region on the global grid
      * @return
