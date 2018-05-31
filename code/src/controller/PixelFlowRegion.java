@@ -164,7 +164,7 @@ public class PixelFlowRegion {
 		}
 	}
 
-	@POPSyncConc
+	@POPAsyncConc
     public void updateFlows(double elapsedTime) {
     	for (int x = 0; x < sites.length; x++) {
 			for (int y = 0; y < sites[0].length; y++) {
