@@ -164,7 +164,7 @@ public class PixelFlowRegion {
 		}
 	}
 
-	@POPClassyncConc
+	@POPAsyncConc
     public void updateFlows(double elapsedTime) {
 
 			PixelFlowRegion me = (PixelFlowRegion) PopJava.getThis(this);
