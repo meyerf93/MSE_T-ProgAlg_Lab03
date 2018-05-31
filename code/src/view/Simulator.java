@@ -244,7 +244,7 @@ public class Simulator extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
-				POPSystemend();
+				POPSystem.end();
 				System.exit(0);
 			}
 		});
