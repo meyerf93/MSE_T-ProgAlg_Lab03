@@ -60,7 +60,7 @@ import ch.icosys.popjava.core.util.Configuration;
       for(int x = 0; x < regions.length; x++) {
         for(int y = 0; y < regions[x].length; y++) {
           regions[x][y] = new PixelFlowRegion(deltaTimePerIteration, siteTypes.toArray(new SiteType[0]), hosts[index],core[index]);
-          indxex++;
+          index++;
         }
       }
 
