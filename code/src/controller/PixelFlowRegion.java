@@ -228,7 +228,7 @@ public class PixelFlowRegion {
     	}
     }
 
-	@POPSyncConc
+	@POPAsyncConc
     public void setFlows(double [] flows, int xTarget, int yTarget, Direction dir) {
     	for(int i = 0; i < flows.length; i++) {
     		int col;
