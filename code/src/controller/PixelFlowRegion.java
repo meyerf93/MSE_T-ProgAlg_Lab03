@@ -246,7 +246,7 @@ public class PixelFlowRegion {
     	}
     }
 
-	@POPSyncConc
+	@POPSyncSeq
     public void updateTempSite(int x, int y, Direction flowDir, double value) {
     	//We are in our own grid
     	if(x >= 0 && y >= 0 && x < sites.length && y < sites[0].length) {
