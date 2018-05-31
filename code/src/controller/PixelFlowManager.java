@@ -56,26 +56,13 @@ import ch.icosys.popjava.core.util.Configuration;
     	this.cols = cols;
 
     	regions = new PixelFlowRegion[DIV_COL][DIV_ROW];
-        for(int x = 0; x < regions.length/2; x++) {
-        	for(int y = 0; y < regions[x].length/2; y++) {
-        		regions[x][y] = new PixelFlowRegion(deltaTimePerIteration, siteTypes.toArray(new SiteType[0]), hosts[0],core[0]);
-        	}
+      int index = 0;
+      for(int x = 0; x < regions.length; x++) {
+        for(int y = 0; y < regions[x].length; y++) {
+          regions[x][y] = new PixelFlowRegion(deltaTimePerIteration, siteTypes.toArray(new SiteType[0]), hosts[index],core[index]);
+          indxex++;
         }
-        for(int x = 0; x < regions.length/2; x++) {
-          for(int y = regions[x].length/2; y < regions[x].length; y++) {
-            regions[x][y] = new PixelFlowRegion(deltaTimePerIteration, siteTypes.toArray(new SiteType[0]), hosts[1],core[1]);
-          }
-        }
-        for(int x = regions.length/2; x < regions.length; x++) {
-        	for(int y = 0; y < regions[x].length; y++) {
-        		regions[x][y] = new PixelFlowRegion(deltaTimePerIteration, siteTypes.toArray(new SiteType[0]), hosts[2],core[2]);
-        	}
-        }
-        for(int x = regions.length/2; x < regions.length; x++) {
-        	for(int y = regions[x].length/2; y < regions[x].length; y++) {
-        		regions[x][y] = new PixelFlowRegion(deltaTimePerIteration, siteTypes.toArray(new SiteType[0]), hosts[3],core[3]);
-        	}
-        }
+      }
 
 
         for(int x = 0; x < regions.length; x++) {
