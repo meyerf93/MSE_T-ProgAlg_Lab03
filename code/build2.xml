@@ -1,0 +1,84 @@
+<project name="POP-Java Matrix multiplication" default="build" basedir=".">
+    <description>
+        Example of how to multiply a Matrix with POP-Java
+    </description>
+	
+    <property name="popjava.jar" value="popjava.jar"/>
+    
+    <property name="application.jar" value="matrix.jar"/>
+    <property name="objectmap" value="objmap.xml"/>
+    <property name="source.folder" value="src"/>
+    <property name="class.folder" value="build"/>
+	
+    <target name="clean" 
+        description="clean the build folder" >
+        
+        <delete file= "${application.jar}"/>
+        <delete file= "${objectmap}"/>
+        <delete dir="${class.folder}"/>
+    </target>
+    
+    <target name="build" description="compile the source " depends="clean">
+    	
+        <mkdir dir="${class.folder}"/>
+
+        <javac srcdir="${source.folder}"
+                    destdir="${class.folder}"
+                    classpath="${popjava.jar}" 
+                                excludes="hefr/matrix/tests/**/*"
+                                debug="true" debuglevel="lines,vars,source"
+                                target="7"
+                                source="7"/>
+                
+
+        <jar destfile="${application.jar}" basedir="${class.folder}" duplicate="preserve" filesetmanifest = "merge">
+            <zipgroupfileset dir=".">
+                <include name="popjava.jar" />
+            </zipgroupfileset>
+        </jar>
+        
+    </target>
+    
+    <target name="run-pop" depends="build" description="Run the application" >
+    	<java fork="true" classname="hefr.matrix.POPMain">
+    		<jvmarg value="-javaagent:${popjava.jar}" />
+    		
+    		<classpath>
+		      <pathelement path="${application.jar}"/>
+		      <pathelement location="${popjava.jar}"/>
+		    </classpath>
+    		
+    		<arg value="5000"/>
+    		
+    		<arg value="2"/>
+    		<arg value="2"/>
+    	</java>
+    </target>
+    
+    <target name="run-seq" depends="build"
+        description="Run the sequential matrix multiplication" >
+	<property name="arg0_size" value="1000"/>
+	<property name="arg1_outputfile" value="result_sequentialmain.txt"/>
+    	<java fork="true" classname="hefr.matrix.SequentialMain">
+    		<classpath>
+		      <pathelement path="${application.jar}"/>
+		      <pathelement location="${popjava.jar}"/>
+		    </classpath>
+    		
+    		<arg value="1000"/>
+    	</java>
+    </target>
+	
+	<target name="run-seq-strassen" depends="build"
+	        description="Run the sequential strassen matrix multiplication" >
+	    	<java fork="true" classname="hefr.matrix.StrassenSequential">
+	    		<classpath>
+			      <pathelement path="${application.jar}"/>
+			      <pathelement location="${popjava.jar}"/>
+			    </classpath>
+	    		
+	    		<arg value="1000"/>
+	    	</java>
+	    </target>
+    
+</project>
