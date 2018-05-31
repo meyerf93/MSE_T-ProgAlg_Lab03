@@ -166,26 +166,29 @@ public class PixelFlowRegion {
 
 	@POPAsyncConc
     public void updateFlows(double elapsedTime) {
+
+			PixelFlowRegion me = (PixelFlowRegion) POPJava.getThis(this);
+
     	for (int x = 0; x < sites.length; x++) {
 			for (int y = 0; y < sites[0].length; y++) {
 				SiteType siteTypeXY = getSiteType(x, y);
 				if (siteTypeXY instanceof SiteSource) {
 					float sourceValue = ((SiteSource) siteTypeXY).getValue(elapsedTime);
 
-					updateTempSite(x + 1, y, Direction.RIGHT, sourceValue);
-					updateTempSite(x - 1, y, Direction.LEFT, sourceValue);
-					updateTempSite(x, y + 1, Direction.DOWN, sourceValue);
-					updateTempSite(x, y - 1, Direction.UP, sourceValue);
+					me.updateTempSite(x + 1, y, Direction.RIGHT, sourceValue);
+					me.updateTempSite(x - 1, y, Direction.LEFT, sourceValue);
+					me.updateTempSite(x, y + 1, Direction.DOWN, sourceValue);
+					me.updateTempSite(x, y - 1, Direction.UP, sourceValue);
 
 				} else {
 					SiteObstacle so = (SiteObstacle) siteTypeXY;
 					double[] gammaFlowPartXY = multiply(so.getGammaMatrix(), sites[x][y].getFlows());
 					double[] betaFlowPartXY = multiply(so.getBetaMatrix(), sites[x][y].getFlows());
 
-					updateTempSite(x + 1, y, Direction.RIGHT, gammaFlowPartXY[Direction.RIGHT.index] + betaFlowPartXY[Direction.RIGHT.index]);
-					updateTempSite(x - 1, y, Direction.LEFT, gammaFlowPartXY[Direction.LEFT.index] + betaFlowPartXY[Direction.LEFT.index]);
-					updateTempSite(x, y + 1, Direction.DOWN, gammaFlowPartXY[Direction.DOWN.index] + betaFlowPartXY[Direction.DOWN.index]);
-					updateTempSite(x, y - 1, Direction.UP, gammaFlowPartXY[Direction.UP.index] + betaFlowPartXY[Direction.UP.index]);
+					me.updateTempSite(x + 1, y, Direction.RIGHT, gammaFlowPartXY[Direction.RIGHT.index] + betaFlowPartXY[Direction.RIGHT.index]);
+					me.updateTempSite(x - 1, y, Direction.LEFT, gammaFlowPartXY[Direction.LEFT.index] + betaFlowPartXY[Direction.LEFT.index]);
+					me.updateTempSite(x, y + 1, Direction.DOWN, gammaFlowPartXY[Direction.DOWN.index] + betaFlowPartXY[Direction.DOWN.index]);
+					me.updateTempSite(x, y - 1, Direction.UP, gammaFlowPartXY[Direction.UP.index] + betaFlowPartXY[Direction.UP.index]);
 				}
 			}
 		}
