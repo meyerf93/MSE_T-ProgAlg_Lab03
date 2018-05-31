@@ -49,8 +49,10 @@ import model.SiteObstacle;
 import model.SiteSource;
 import model.SiteType;
 
+import ch.icosys.popjava.core.system.POPSystem;
+
 /**
- * 
+ *
  * @author Gisler Christophe
  *
  */
@@ -103,7 +105,7 @@ public class Simulator extends JFrame {
 		// Load default Pixel Flow grid from file if exist
 		loadDefaultGrid();
 	}
-	
+
 	/**
 	 * Recover the correct screensize.
 	 * Why this is done in the first place is unclear, but this is required to work
@@ -112,17 +114,17 @@ public class Simulator extends JFrame {
 	private Dimension setupScreenSize(){
 	    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 	    GraphicsDevice[] gs = ge.getScreenDevices();
-	    
+
 	    int minWidth = Integer.MAX_VALUE;
 	    int minHeight = Integer.MAX_VALUE;
 	    for(GraphicsDevice curGs : gs)
 	    {
 	          DisplayMode dm = curGs.getDisplayMode();
-	          
+
 	          minWidth = Math.min(dm.getWidth(), minWidth);
 	          minHeight = Math.min(dm.getHeight(), minHeight);
 	    }
-	    
+
 	    return new Dimension(minWidth, minHeight - 83); //83 is a magic value from the previous code. Parts of the display are cutoff otherwise
 	}
 
@@ -242,6 +244,7 @@ public class Simulator extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
+				POPSystemend();
 				System.exit(0);
 			}
 		});
@@ -355,7 +358,7 @@ public class Simulator extends JFrame {
 		});
 		final JComboBox<ViewMode> viewModeCB = new JComboBox<>(ViewMode.values());
 		viewModeCB.addItemListener(new ItemListener() {
-			
+
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if(e.getStateChange() == ItemEvent.SELECTED) {
@@ -363,9 +366,9 @@ public class Simulator extends JFrame {
 				}
 			}
 		});
-		
+
 		viewModeCB.setSelectedItem(ViewMode.Blank);
-		
+
 		commandPanel.add(viewModeCB);
 		commandPanel.add(resetFlowButton);
 		add(commandPanel, BorderLayout.PAGE_END);
@@ -461,9 +464,9 @@ public class Simulator extends JFrame {
 			int cols = Integer.parseInt(cellularAutomatonDim[1]);
 			pixelFlowManager.reinitializeSites(rows, cols, false);
 			int row = 0;
-			
-			int [][] siteTypes = new int[cols][rows]; 
-			
+
+			int [][] siteTypes = new int[cols][rows];
+
 			while (scanner.hasNextLine()) {
 				String[] rowValues = scanner.nextLine().split(SEP);
 				for (int col = 0; col < rowValues.length; col++) {
@@ -473,7 +476,7 @@ public class Simulator extends JFrame {
 				}
 				row++;
 			}
-			
+
 			pixelFlowManager.setSiteTypes(siteTypes);
 			if (gridPanel != null) {
 				gridPanel.update();
@@ -511,7 +514,7 @@ public class Simulator extends JFrame {
 
 	/**
 	 * Convert the elapsed time to a formatted string: "XhYmZs"
-	 * 
+	 *
 	 * @param elapsedTime
 	 * @return string formatted as "X Days Y Hours Z Minutes A Seconds".
 	 */
@@ -543,25 +546,25 @@ public class Simulator extends JFrame {
 			while (isRunning) {
 				try {
 					long t0 = System.currentTimeMillis();
-					
+
 					pixelFlowManager.step();
-					
+
 					final long dt = System.currentTimeMillis() - t0;
-					
+
 					System.out.println("Calculated step in "+(dt)+" ms");
-					
+
 					final long sleepTime = Math.max((long) (1000.0 / fps) - dt, 0);
-					
+
 					SwingUtilities.invokeLater(new Runnable() {
-						
+
 						@Override
 						public void run() {
 							gridPanel.repaint();
-							
+
 							if (sleepTime == 0) {
 								fpsLabel.setText((long) (1000.0 / dt) + " FPS");
 							}
-							
+
 							simulationTimeLabel
 									.setText("Simulation duration: " + getFormattedDuration(pixelFlowManager.getElapsedTime()));
 							if (simulationMaxTimeSpinner.isEnabled() && pixelFlowManager.getElapsedTime() >= maxSimulTime) {
@@ -569,7 +572,7 @@ public class Simulator extends JFrame {
 							}
 						}
 					});
-					
+
 					Thread.sleep(sleepTime);
 				} catch (InterruptedException e) {
 				}
