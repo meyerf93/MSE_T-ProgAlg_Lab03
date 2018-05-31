@@ -70,7 +70,7 @@ public class PixelFlowRegion {
 		this.cores = cores;
     }
 
-	@POPAsyncConc
+	@POPSyncConc
     public void createSites(int x, int y, int width, int height, int globalCols, int globalRows, boolean copy) {
     	this.x = x;
     	this.y = y;
@@ -100,13 +100,13 @@ public class PixelFlowRegion {
 
     private PixelFlowRegion fake;
 
-	@POPAsyncConc
+	@POPSyncConc
     public void setNeighbour(PixelFlowRegion neighbour, Direction dir) {
         fake = neighbour;//TODO: This is a POPJava workaround as otherwise the connection is closed to neighbour after function ends
     	neighbours.put(dir, neighbour);
     }
 
-	@POPAsyncConc
+	@POPSyncConc
     public void initSites(int defaultSiteTypeIndex, float initialTemperature, boolean copy) {
     	for(int x = 0; x < sites.length; x++) {
         	for(int y = 0; y < sites[x].length; y++) {
@@ -125,7 +125,7 @@ public class PixelFlowRegion {
     	return sites[col - x][row - y];
     }
 
-	@POPAsyncConc
+	@POPSyncConc
     public void setSiteType(int col, int row, int type) {
     	sites[col - x][row - y].setTypeIndex(type);
     }
@@ -153,7 +153,7 @@ public class PixelFlowRegion {
         return types;
     }
 
-	@POPAsyncConc
+	@POPSyncConc
 	public void prepareFlowUpdate() {
     	//Create copy of current sites
     	tempSites = new Site[sites.length][sites[0].length];
@@ -266,12 +266,12 @@ public class PixelFlowRegion {
     	}
     }
 
-	@POPAsyncConc
+	@POPSyncConc
 	public void finishFlowUpdate() {
 		this.sites = tempSites;
 	}
 
-	@POPAsyncConc
+	@POPSyncConc
     public void updateTemperatures() {
         for (int x = 0; x < sites.length; x++) {
             for (int y = 0; y < sites[0].length; y++) {
@@ -302,7 +302,7 @@ public class PixelFlowRegion {
         }
 
     }
-	@POPAsyncConc
+	@POPSyncConc
     private SiteType getSiteType(int row, int col) {
 		return siteTypes[sites[row][col].getTypeIndex()];
 	}
