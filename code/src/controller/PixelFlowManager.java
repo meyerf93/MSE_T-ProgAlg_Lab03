@@ -43,7 +43,7 @@ import ch.icosys.popjava.core.util.Configuration;
             float initialTemperature){
 
         //  String[] hosts = {"grid61","grid62","grid63","grid64"};
-       String[] hosts ={"localhost","localthost","localhost","localhost"}; 
+       String[] hosts ={"localhost","localhost","localhost","localhost"}; 
 
         int[] core = {16,16,16,16};
         this.siteTypes = Arrays.asList(siteTypesArray);
