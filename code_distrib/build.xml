@@ -1,0 +1,32 @@
+<project name="Cellular Automaton example" default="build" basedir=".">
+    
+    <property name="application.jar" value="cellular.jar"/>
+    <property name="source.folder" value="src"/>
+    <property name="class.folder" value="build"/>
+	
+    <target name="clean" 
+        description="clean the build folder" >
+        
+        <delete file= "${application.jar}"/>
+        <delete dir="${class.folder}"/>
+    </target>
+    
+    <target name="build" description="compile the sources" depends="clean">
+    	
+        <mkdir dir="${class.folder}"/>
+
+        <javac srcdir="${source.folder}"
+                    destdir="${class.folder}" 
+                                debug="true" debuglevel="lines,vars,source"/>
+    	
+    	<jar destfile="${application.jar}" basedir="${class.folder}" duplicate="preserve" filesetmanifest = "merge">
+    		<manifest>
+				<attribute name="Class-Path" value="." />
+				<attribute name="Main-Class" value="view.Simulator" />
+			</manifest>
+        </jar>
+    </target>
+	
+	
+    
+</project>
